@@ -1,10 +1,10 @@
-// app/play/page.js - Puzzle Play Page
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function Play() {
+// Create a separate component that uses useSearchParams
+function PuzzleContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -303,5 +303,14 @@ export default function Play() {
         ))}
       </div>
     </div>
+  );
+}
+
+// Main component that wraps PuzzleContent in a Suspense boundary
+export default function Play() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading puzzle...</div>}>
+      <PuzzleContent />
+    </Suspense>
   );
 }

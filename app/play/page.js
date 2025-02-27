@@ -244,16 +244,18 @@ function PuzzleContent() {
           {gameState.selectedWords.map((word, index) => (
             <div
               key={index}
-              className="h-16 flex items-center justify-center bg-yellow-100 border-2 border-yellow-500 rounded-lg p-2 text-center font-medium cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+              className="min-h-16 flex items-center justify-center bg-yellow-100 border-2 border-yellow-500 rounded-lg p-2 text-center font-medium cursor-pointer shadow-sm hover:shadow-md transition-shadow"
               onClick={() => handleWordSelect(gameState.shuffledWords.findIndex(w => w.text === word.text))}
             >
-              <span className="text-gray-800">{word.text}</span>
+              <span className={`text-gray-800 ${word.text.length > 8 ? 'text-xs sm:text-sm' : 'text-sm sm:text-base'} hyphens-auto break-words`}>
+                {word.text}
+              </span>
             </div>
           ))}
           {Array(4 - gameState.selectedWords.length).fill(0).map((_, index) => (
             <div
               key={`empty-${index}`}
-              className="h-16 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg p-2"
+              className="min-h-16 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg p-2"
             ></div>
           ))}
         </div>
@@ -269,7 +271,7 @@ function PuzzleContent() {
             return (
               <div
                 key={index}
-                className={`h-16 flex items-center justify-center rounded-lg p-2 text-center font-medium transition-all duration-300 
+                className={`min-h-16 flex items-center justify-center rounded-lg p-2 text-center font-medium transition-all duration-300 
                   ${completed 
                     ? 'text-white shadow-md cursor-default' 
                     : selected
@@ -279,7 +281,7 @@ function PuzzleContent() {
                 style={completed ? { backgroundColor: category.color } : {}}
                 onClick={() => handleWordSelect(index)}
               >
-                <span className={completed ? 'text-white' : 'text-gray-800'}>
+                <span className={`${completed ? 'text-white' : 'text-gray-800'} ${word.text.length > 8 ? 'text-xs sm:text-sm' : 'text-sm sm:text-base'} hyphens-auto break-words`}>
                   {word.text}
                 </span>
               </div>

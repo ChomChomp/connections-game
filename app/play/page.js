@@ -17,6 +17,7 @@ function PuzzleContent() {
     completedCategories: [],
     mistakes: 0,
     shuffledWords: [],
+    gameOver: false
   });
   const [message, setMessage] = useState('');
   const [isMessageError, setIsMessageError] = useState(false);
@@ -65,6 +66,11 @@ function PuzzleContent() {
   }, [searchParams, isClient]);
 
   const handleWordSelect = (wordIndex) => {
+    // Don't allow selection if the game is over
+    if (gameState.gameOver) {
+      return;
+    }
+    
     const word = gameState.shuffledWords[wordIndex];
     
     // Skip if word is already part of a completed category
@@ -129,18 +135,59 @@ function PuzzleContent() {
       });
     } else {
       // Incorrect group
+      const newMistakeCount = gameState.mistakes + 1;
+      
       setGameState(prev => ({
         ...prev,
         selectedWords: [],
-        mistakes: prev.mistakes + 1,
+        mistakes: newMistakeCount,
       }));
       
-      setMessage('Incorrect grouping. Try again!');
-      setIsMessageError(true);
-      setTimeout(() => setMessage(''), 2000);
+      if (newMistakeCount >= 7) {
+        // Game over - show complete solution
+        showSolution();
+        setMessage('Game over! All solutions revealed.');
+        setIsMessageError(true);
+      } else {
+        setMessage('Incorrect grouping. Try again!');
+        setIsMessageError(true);
+        setTimeout(() => setMessage(''), 2000);
+      }
     }
   };
-  
+
+  // Add a new function to show the solution when the game is over
+  const showSolution = () => {
+    // Find all remaining categories that haven't been solved yet
+    const solvedCategoryNames = gameState.completedCategories.map(cat => cat.name);
+    
+    // Get the unsolved categories from the puzzle
+    const unsolvedCategories = puzzle.filter(
+      category => !solvedCategoryNames.includes(category.name)
+    ).map(category => {
+      // Convert to same format as completed categories
+      return {
+        name: category.name,
+        color: category.color,
+        words: category.words.map(word => ({
+          text: word,
+          category: category.name,
+          color: category.color
+        }))
+      };
+    });
+    
+    // Add unsolved categories to the state
+    setGameState(prev => ({
+      ...prev,
+      completedCategories: [
+        ...prev.completedCategories,
+        ...unsolvedCategories
+      ],
+      gameOver: true
+    }));
+  };
+
   const createNewPuzzle = () => {
     router.push('/');
   };
@@ -196,7 +243,7 @@ function PuzzleContent() {
       <div className="flex items-center justify-center mb-5">
         <span className="mr-2 font-medium">Mistakes:</span>
         <div className="flex space-x-1">
-          {[...Array(4)].map((_, i) => (
+          {[...Array(7)].map((_, i) => (
             <div 
               key={i} 
               className={`w-3 h-3 rounded-full ${i < gameState.mistakes ? 'bg-red-500' : 'bg-gray-300'}`}
@@ -274,6 +321,8 @@ function PuzzleContent() {
                 className={`min-h-16 flex items-center justify-center rounded-lg p-2 text-center font-medium transition-all duration-300 
                   ${completed 
                     ? 'text-white shadow-md cursor-default' 
+                    : gameState.gameOver
+                    ? 'bg-gray-300 border border-gray-400 cursor-not-allowed opacity-70'
                     : selected
                     ? 'bg-yellow-100 border-2 border-yellow-500 shadow-md hover:shadow-lg scale-[1.02] hover-float'
                     : 'bg-gray-100 border border-gray-200 hover:bg-gray-200 hover:border-gray-300 cursor-pointer hover-float'

@@ -4,6 +4,8 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ThemeToggle from '../components/ThemeToggle';
 import { useTheme } from '../context/ThemeContext';
+import { shortenUrl } from '../utils/urlShortener';
+import ShareButton from '../components/ShareButton';
 
 // Create a separate component that uses useSearchParams
 function PuzzleContent() {
@@ -192,11 +194,42 @@ function PuzzleContent() {
     router.push('/');
   };
   
-  const copyShareLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setMessage('Link copied to clipboard!');
-    setIsMessageError(false);
-    setTimeout(() => setMessage(''), 2000);
+  const copyShareLink = async () => {
+    try {
+      // Show a loading message
+      setMessage('Creating short link...');
+      setIsMessageError(false);
+      
+      // Get the current URL and shorten it
+      const currentUrl = window.location.href;
+      const shortUrl = await shortenUrl(currentUrl);
+      
+      // Copy to clipboard
+      await navigator.clipboard.writeText(shortUrl);
+      
+      // If we got back the original URL, it means shortening failed
+      if (shortUrl === currentUrl) {
+        setMessage('Using full link (shortening unavailable)');
+      } else {
+        setMessage('Short link copied to clipboard!');
+      }
+      
+      setIsMessageError(false);
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      console.error("Error copying link:", error);
+      
+      // Fallback - try to copy the full URL
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setMessage('Full link copied (shortening failed)');
+        setIsMessageError(false);
+      } catch (clipboardError) {
+        setMessage('Failed to copy link!');
+        setIsMessageError(true);
+      }
+      setTimeout(() => setMessage(''), 3000);
+    }
   };
   
   // For the return statement, conditionally render based on isClient
@@ -261,15 +294,10 @@ function PuzzleContent() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-[var(--foreground)]">Custom Connections</h1>
         <div>
-          <button
-            onClick={copyShareLink}
-            className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-lg mr-2 font-medium transition-colors"
-          >
-            Share
-          </button>
+          <ShareButton />
           <button
             onClick={createNewPuzzle}
-            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors ml-2"
           >
             New Puzzle
           </button>

@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import TestDataGenerator from './components/TestDataGenerator';
+//import TestDataGenerator from './components/TestDataGenerator';
 import ThemeToggle from './components/ThemeToggle';
 import { useTheme } from './context/ThemeContext'; // Add this import
 import ShareButton from './components/ShareButton'; // Add this import
@@ -140,7 +140,7 @@ export default function Home() {
       </div>
       
       {/* Test Data Generator - Easy to comment out */}
-      <TestDataGenerator onFill={setCategories} />
+      {/*<TestDataGenerator onFill={setCategories} />*/}
       
       <div className="mt-8 text-gray-600 dark:text-gray-400 text-sm text-center">
         <p>After creating your puzzle, you'll get a shareable link to send to friends!</p>

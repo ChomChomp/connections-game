@@ -2,11 +2,14 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import ThemeToggle from '../components/ThemeToggle';
+import { useTheme } from '../context/ThemeContext';
 
 // Create a separate component that uses useSearchParams
 function PuzzleContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { darkMode } = useTheme(); // Add this
   
   const [puzzle, setPuzzle] = useState(null);
   const [gameState, setGameState] = useState({
@@ -205,13 +208,15 @@ function PuzzleContent() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl min-h-screen bg-gray-50 flex flex-col">
+    <div className="container mx-auto px-4 py-8 max-w-2xl min-h-screen bg-[var(--background)] flex flex-col">
+      <ThemeToggle />
+      
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-blue-900">Connections</h1>
+        <h1 className="text-3xl font-bold text-[var(--foreground)]">Custom Connections</h1>
         <div>
           <button
             onClick={copyShareLink}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-lg mr-2 font-medium transition-colors"
+            className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-lg mr-2 font-medium transition-colors"
           >
             Share
           </button>
@@ -234,7 +239,7 @@ function PuzzleContent() {
       
       {renderMistakesIndicator()}
       
-      <div className="bg-white rounded-xl shadow-md p-4 mb-6">
+      <div className="bg-[var(--card-bg)] dark:text-[var(--foreground)] rounded-xl shadow-md p-4 mb-6">
         <div className="grid grid-cols-4 gap-3">
           {gameState.selectedWords.map((word, index) => (
             <div
@@ -254,7 +259,7 @@ function PuzzleContent() {
         </div>
       </div>
       
-      <div className="bg-white rounded-xl shadow-md p-4 mb-8">
+      <div className="bg-[var(--card-bg)] dark:text-[var(--foreground)] rounded-xl shadow-md p-4 mb-8">
         <div className="grid grid-cols-4 gap-3">
           {gameState.shuffledWords.map((word, index) => {
             const completed = isWordCompleted(word);
@@ -264,12 +269,12 @@ function PuzzleContent() {
             return (
               <div
                 key={index}
-                className={`h-16 flex items-center justify-center rounded-lg p-2 text-center font-medium transition-all 
+                className={`h-16 flex items-center justify-center rounded-lg p-2 text-center font-medium transition-all duration-300 
                   ${completed 
-                    ? 'text-white shadow-md' 
+                    ? 'text-white shadow-md cursor-default' 
                     : selected
-                    ? 'bg-yellow-100 border-2 border-yellow-500 shadow-md hover:shadow-lg scale-[1.02]'
-                    : 'bg-gray-100 border border-gray-200 hover:bg-gray-200 hover:border-gray-300 cursor-pointer'
+                    ? 'bg-yellow-100 border-2 border-yellow-500 shadow-md hover:shadow-lg scale-[1.02] hover-float'
+                    : 'bg-gray-100 border border-gray-200 hover:bg-gray-200 hover:border-gray-300 cursor-pointer hover-float'
                   }`}
                 style={completed ? { backgroundColor: category.color } : {}}
                 onClick={() => handleWordSelect(index)}
@@ -284,7 +289,7 @@ function PuzzleContent() {
       </div>
       
       <div className="space-y-3 mt-auto">
-        <h2 className="text-xl font-bold text-gray-700 mb-2">Solved Categories:</h2>
+        <h2 className="text-xl font-bold text-[var(--foreground)] mb-2">Solved Categories:</h2>
         {gameState.completedCategories.map((category, index) => (
           <div
             key={index}

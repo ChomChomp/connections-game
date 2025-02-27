@@ -1,5 +1,6 @@
-// app/layout.js - Root Layout
 import './globals.css';
+import { ThemeProvider } from './context/ThemeContext';
+
 export const metadata = {
   title: 'Custom Connections Game',
   description: 'Create and share your own connections puzzles',
@@ -7,8 +8,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

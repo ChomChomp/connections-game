@@ -1,5 +1,6 @@
 import './globals.css';
 import { ThemeProvider } from './context/ThemeContext';
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata = {
   title: 'Custom Connections Game',
@@ -12,6 +13,7 @@ export default function RootLayout({ children }) {
       <body suppressHydrationWarning>
         <ThemeProvider>
           {children}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
